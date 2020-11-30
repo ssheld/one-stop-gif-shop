@@ -14,6 +14,7 @@ import org.springframework.validation.Validator;
 
 @Component
 public class GifValidator implements Validator {
+
     @Autowired
     private Validator validator;
 
@@ -32,10 +33,26 @@ public class GifValidator implements Validator {
             errors.rejectValue("file", "file.required", "Please choose a file to upload");
         }
 
+        String contentType = gif.getFile().getContentType();
+
+        if (!gif.getFile().isEmpty() && !isSupportedContent(contentType)) {
+
+            String[] fileType = contentType.split("/");
+            StringBuilder fileExtension = new StringBuilder();
+            fileExtension.append(".");
+            fileExtension.append(fileType[1]);
+
+            errors.rejectValue("file", "Incorrect file format", fileExtension.toString() + " is not supported file type. Please upload a .gif file.");
+        }
+
         // Validate description
         ValidationUtils.rejectIfEmptyOrWhitespace(errors,"description","description.empty","Please enter a description");
 
         // Validate category
         ValidationUtils.rejectIfEmpty(errors,"category","category.empty","Please choose a category");
+    }
+
+    private boolean isSupportedContent(String contentType) {
+        return contentType.equals("image/gif");
     }
 }

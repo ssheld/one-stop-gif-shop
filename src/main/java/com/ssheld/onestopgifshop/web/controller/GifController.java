@@ -3,12 +3,14 @@ package com.ssheld.onestopgifshop.web.controller;
 import com.ssheld.onestopgifshop.model.Gif;
 import com.ssheld.onestopgifshop.service.CategoryService;
 import com.ssheld.onestopgifshop.service.GifService;
+import com.ssheld.onestopgifshop.validator.GifValidator;
 import com.ssheld.onestopgifshop.web.FlashMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +28,11 @@ public class GifController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @InitBinder("gif")
+    protected void initBinder(WebDataBinder binder) {
+        binder.setValidator(new GifValidator());
+    }
 
     // Home page - index of all GIFs
     @RequestMapping("/")
@@ -75,9 +82,17 @@ public class GifController {
 
     // Upload a new GIF
     @RequestMapping(value = "/gifs", method = RequestMethod.POST)
-    public String addGif(@Valid Gif gif, @RequestParam MultipartFile file, RedirectAttributes redirectAttributes) {
+    public String addGif(@Valid Gif gif, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+
+        // Check for errors
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.gif", bindingResult);
+            redirectAttributes.addFlashAttribute("gif", gif);
+            return "redirect:/upload";
+        }
+
         // Upload new GIF if data is valid
-        gifService.save(gif, file);
+        gifService.save(gif, gif.getFile());
 
         // Add flash message for success
         redirectAttributes.addFlashAttribute("flash", new FlashMessage("GIF successfully uploaded!", FlashMessage.Status.SUCCESS));
