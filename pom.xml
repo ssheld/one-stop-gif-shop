@@ -6,7 +6,7 @@
 
     <groupId>com.ssheld</groupId>
     <artifactId>one-stop-gif-shop</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -15,7 +15,7 @@
 <!--        <apache.httpcomponents.version>4.5.10</apache.httpcomponents.version>-->
 <!--        <testng.version>7.0.0</testng.version>-->
 <!--        <mockito.core.version>3.2.4</mockito.core.version>-->
-        <maven.war.plugin.version>3.0.0</maven.war.plugin.version>
+<!--        <maven.war.plugin.version>3.0.0</maven.war.plugin.version>-->
     </properties>
 
     <dependencies>
@@ -100,7 +100,6 @@
     </dependencies>
 
     <build>
-        <finalName>one-stop-gif-shop</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -112,15 +111,39 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>${maven.war.plugin.version}</version>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <outputDirectory>${project.build.directory}</outputDirectory>
-                </configuration>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <id>one-stop-gif-shop-app</id>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <mainClass>com.ssheld.onestopgifshop.Application</mainClass>
+                                    </manifestEntries>
+                                </transformer>
+                            </transformers>
+                            <finalName>one-stop-gif-shop-app</finalName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
-
-
 </project>
