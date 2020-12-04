@@ -12,10 +12,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <springframework.boot.version>2.3.5.RELEASE</springframework.boot.version>
-<!--        <apache.httpcomponents.version>4.5.10</apache.httpcomponents.version>-->
-<!--        <testng.version>7.0.0</testng.version>-->
-<!--        <mockito.core.version>3.2.4</mockito.core.version>-->
-<!--        <maven.war.plugin.version>3.0.0</maven.war.plugin.version>-->
     </properties>
 
     <dependencies>
