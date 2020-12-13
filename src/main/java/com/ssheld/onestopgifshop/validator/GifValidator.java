@@ -35,7 +35,8 @@ public class GifValidator implements Validator {
 
         String contentType = gif.getFile().getContentType();
 
-        if (!gif.getFile().isEmpty() && !isSupportedContent(contentType)) {
+        // Make sure file uploaded is a gif
+        if (!gif.getFile().isEmpty() && contentType != null && !isSupportedContent(contentType)) {
 
             String[] fileType = contentType.split("/");
             StringBuilder fileExtension = new StringBuilder();
@@ -44,6 +45,8 @@ public class GifValidator implements Validator {
 
             errors.rejectValue("file", "Incorrect file format", fileExtension.toString() + " is not supported file type. Please upload a .gif file.");
         }
+
+        // TODO File size validation is neeeded - should probably occur on front-end
 
         // Validate description
         ValidationUtils.rejectIfEmptyOrWhitespace(errors,"description","description.empty","Please enter a description");
