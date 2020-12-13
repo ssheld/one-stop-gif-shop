@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
@@ -68,7 +69,7 @@ public class GifController {
         // Grab all GIFs then check which ones
         // are favorited.
         List<Gif> faves = new ArrayList<>();
-        List<Gif> gifs = new ArrayList<>();
+        List<Gif> gifs;
         gifs = gifService.findAll();
         for (Gif g : gifs) {
             if (g.isFavorite()) {
@@ -123,6 +124,7 @@ public class GifController {
         if (!model.containsAttribute("gif")) {
             model.addAttribute("gif", gifService.findById(gifId));
         }
+        // TODO - Add GIF file as default file selected in "upload file"
         model.addAttribute("categories", categoryService.findAll());
         model.addAttribute("action", String.format("/gifs/%s",gifId));
         model.addAttribute("heading", "Edit GIF");
@@ -133,11 +135,21 @@ public class GifController {
 
     // Update an existing GIF
     @RequestMapping(value = "/gifs/{gifId}", method = RequestMethod.POST)
-    public String updateGif() {
-        // TODO: Update GIF if data is valid
+    public String updateGif(@Valid Gif gif, BindingResult result, RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            // Include the validation errors upon redirect
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.category", result);
+            // Add gif if invalid data was received
+            redirectAttributes.addFlashAttribute("gif", gif);
+            // Redirect back to the form
+            return String.format("redirect:/gif/%s/edit", gif.getId());
+        }
 
-        // TODO: Redirect browser to updated GIF's detail view
-        return null;
+        gifService.save(gif, gif.getFile());
+
+        redirectAttributes.addFlashAttribute("flash", new FlashMessage("Gif successfully updated!", FlashMessage.Status.SUCCESS));
+
+        return String.format("redirect:/gifs/%s", gif.getId());
     }
 
     // Delete an existing GIF
