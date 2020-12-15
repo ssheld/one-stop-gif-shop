@@ -2,7 +2,9 @@ package com.ssheld.onestopgifshop.config;
 
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
@@ -16,10 +18,22 @@ import javax.sql.DataSource;
  * Author: Stephen Sheldon
  **/
 @Configuration
-@PropertySource("app.properties")
+@ComponentScan(basePackages = {"com.ssheld"})
+@PropertySource("classpath:db/jdbc.properties")
 public class DataConfig {
     @Autowired
     private Environment env;
+
+    // Pull values from jdbc.properties file while providing
+    // a default implementation in the case property can't be found.
+    @Value("${onestopgifshop.db.driver}")
+    private String driverClassName;
+    @Value("${onestopgifshop.db.url}")
+    private String url;
+    @Value("${onestopgifshop.db.username}")
+    private String username;
+    @Value("${onestopgifshop.db.password}")
+    private String password;
 
     @Bean
     public LocalSessionFactoryBean sessionFactory() {

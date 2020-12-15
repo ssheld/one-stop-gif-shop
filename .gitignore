@@ -80,3 +80,4 @@ one-stop-gif-shop.iml
 
 # Target files
 /target/*
+/src/main/resources/db/jdbc.properties

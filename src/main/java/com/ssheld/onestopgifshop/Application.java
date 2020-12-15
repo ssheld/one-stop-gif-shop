@@ -17,26 +17,12 @@ public class Application {
     private static Logger logger = LoggerFactory.getLogger(Application.class);
 
     @Autowired
-    private ApplicationContext appContext;
+    ApplicationContext appContext;
 
     public static void main(String[] args) {
-        try {
-            org.h2.tools.Server.createTcpServer().start();
-        } catch (Exception e) {
-            System.out.println("Could not start H2 database");
-        }
+
         logger.info("Starting application!");
-//        SpringApplication.run(OneStopGifShopApplication.class, args);
         SpringApplication.run(Application.class, args);
         logger.info("Application has started!");
     }
-
-//    public void run(String... args) throws Exception {
-//
-//        String[] beans = appContext.getBeanDefinitionNames();
-//        Arrays.sort(beans);
-//        for (String bean : beans) {
-//            logger.info(bean.toString());
-//        }
-//    }
 }
