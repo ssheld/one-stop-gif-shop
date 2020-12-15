@@ -1,6 +1,8 @@
 package com.ssheld.onestopgifshop.web.controller;
 
+import com.ssheld.onestopgifshop.gifrekognition.GifMetadataExtractor;
 import com.ssheld.onestopgifshop.model.Gif;
+import com.ssheld.onestopgifshop.model.GifMetadata;
 import com.ssheld.onestopgifshop.service.CategoryService;
 import com.ssheld.onestopgifshop.service.GifService;
 import com.ssheld.onestopgifshop.validator.GifValidator;
@@ -11,11 +13,11 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +52,9 @@ public class GifController {
     public String gifDetails(@PathVariable Long gifId, Model model) {
         // Get gif whose id is gifId
         Gif gif = gifService.findById(gifId);
+
+        // Generate keyword string
+        gif.generateKeywordString();
 
         model.addAttribute("gif", gif);
         return "gif/details";
@@ -90,6 +95,22 @@ public class GifController {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.gif", bindingResult);
             redirectAttributes.addFlashAttribute("gif", gif);
             return "redirect:/upload";
+        }
+
+        // Extract fames from Gif
+        GifMetadataExtractor gifMetadataExtractor = new GifMetadataExtractor(gif.getFile());
+
+        GifMetadata gifMetadata = null;
+        // Generate frames from gif
+        try {
+            gifMetadata = gifMetadataExtractor.generateGifMetadata();
+        } catch (IOException e) {
+            // catch error
+        }
+
+        // Set gif metadata
+        if (gifMetadata != null) {
+            gif.setGifMetaData(gifMetadata);
         }
 
         // Upload new GIF if data is valid
@@ -143,6 +164,22 @@ public class GifController {
             redirectAttributes.addFlashAttribute("gif", gif);
             // Redirect back to the form
             return String.format("redirect:/gif/%s/edit", gif.getId());
+        }
+
+        // Extract fames from Gif
+        GifMetadataExtractor gifMetadataExtractor = new GifMetadataExtractor(gif.getFile());
+
+        GifMetadata gifMetadata = null;
+        // Generate frames from gif
+        try {
+            gifMetadata = gifMetadataExtractor.generateGifMetadata();
+        } catch (IOException e) {
+            // catch error
+        }
+
+        // Set gif metadata
+        if (gifMetadata != null) {
+            gif.setGifMetaData(gifMetadata);
         }
 
         gifService.save(gif, gif.getFile());

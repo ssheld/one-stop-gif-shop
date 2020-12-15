@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 /**
  * Author: Stephen Sheldon
@@ -30,6 +31,11 @@ public class Gif {
     private String username = "You";
     private boolean favorite;
     private String hash;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    private GifMetadata gifMetaData;
+
+    String keywordString;
 
     public Gif(){}
 
@@ -123,6 +129,32 @@ public class Gif {
 
     public void setFile(MultipartFile file) {
         this.file = file;
+    }
+
+    public GifMetadata getGifMetaData() {
+        return gifMetaData;
+    }
+
+    public void setGifMetaData(GifMetadata gifMetaData) {
+        this.gifMetaData = gifMetaData;
+    }
+
+    public void generateKeywordString() {
+        List<Keyword> keywordList = gifMetaData.getKeywordList();
+        StringBuilder b = new StringBuilder();
+        b.append("Keywords: ");
+        for (int i = 0; i < keywordList.size(); i++) {
+            b.append((keywordList.get(i).getKeyword()));
+            if (i < keywordList.size()-1) {
+                b.append(", ");
+            }
+        }
+
+        keywordString = b.toString();
+    }
+
+    public String getKeywordString() {
+        return keywordString;
     }
 }
 

@@ -1,6 +1,6 @@
 package com.ssheld.onestopgifshop.dao;
 
-import com.ssheld.onestopgifshop.model.Gif;
+import com.ssheld.onestopgifshop.model.Keyword;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,70 +14,64 @@ import java.util.List;
  * Author: Stephen Sheldon
  **/
 @Repository
-public class GifDaoImpl implements GifDao {
+public class KeywordDaoImpl {
     @Autowired
     private SessionFactory sessionFactory;
 
-    public List<Gif> findAll() {
-        // Open session
+    public List<Keyword> findAll() {
+        // Open a session
         Session session = sessionFactory.openSession();
 
         // Create CriteriaBuilder
         CriteriaBuilder builder = session.getCriteriaBuilder();
 
         // Create CriteriaQuery
-        CriteriaQuery<Gif> criteria = builder.createQuery(Gif.class);
+        CriteriaQuery<Keyword> criteria = builder.createQuery(Keyword.class);
 
         // Specify criteria root
-        criteria.from(Gif.class);
+        criteria.from(Keyword.class);
 
         // Execute query
-        List<Gif> gifs = session.createQuery(criteria).getResultList();
+        List<Keyword> keywords = session.createQuery(criteria).getResultList();
 
         // Close session
         session.close();
 
-        return gifs;
+        return keywords;
     }
 
-    public Gif findById(Long id) {
+    public Keyword findById(Long id) {
         // Open session
         Session session = sessionFactory.openSession();
-        Gif gif = session.get(Gif.class, id);
+        Keyword keyword = session.get(Keyword.class, id);
         // Close session
         session.close();
 
-        return gif;
+        return keyword;
     }
 
-    public void save(Gif gif) {
-        // Open session
+    public void save(Keyword keyword) {
+        // Open a session
         Session session = sessionFactory.openSession();
 
+        // Begin a transaction
         session.beginTransaction();
-        // Save all keywords
-        if (gif.getGifMetaData() != null) {
-            for (int i = 0; i < gif.getGifMetaData().getKeywordList().size(); i++) {
-                session.saveOrUpdate(gif.getGifMetaData().getKeywordList().get(i));
-            }
-            session.saveOrUpdate(gif.getGifMetaData());
-        }
-        session.saveOrUpdate(gif);
+
+        // Save or update the keyword
+        session.saveOrUpdate(keyword);
+
+        // Commit the transaction
         session.getTransaction().commit();
 
-        // Close session
+        // Close the session
         session.close();
     }
 
-    public void delete(Gif gif) {
-        // Open session
+    public void delete(Keyword keyword) {
         Session session = sessionFactory.openSession();
-
         session.beginTransaction();
-        session.delete(gif);
+        session.delete(keyword);
         session.getTransaction().commit();
-
-        // Close session
         session.close();
     }
 }

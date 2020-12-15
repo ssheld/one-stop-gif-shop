@@ -1,6 +1,7 @@
 package com.ssheld.onestopgifshop.dao;
 
-import com.ssheld.onestopgifshop.model.Gif;
+import com.ssheld.onestopgifshop.model.GifMetadata;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,70 +15,62 @@ import java.util.List;
  * Author: Stephen Sheldon
  **/
 @Repository
-public class GifDaoImpl implements GifDao {
+public class GifMetadataDaoImpl {
     @Autowired
     private SessionFactory sessionFactory;
 
-    public List<Gif> findAll() {
-        // Open session
+    public List<GifMetadata> findAll() {
+        // Open a session
         Session session = sessionFactory.openSession();
 
         // Create CriteriaBuilder
         CriteriaBuilder builder = session.getCriteriaBuilder();
 
         // Create CriteriaQuery
-        CriteriaQuery<Gif> criteria = builder.createQuery(Gif.class);
+        CriteriaQuery<GifMetadata> criteria = builder.createQuery(GifMetadata.class);
 
         // Specify criteria root
-        criteria.from(Gif.class);
+        criteria.from(GifMetadata.class);
 
         // Execute query
-        List<Gif> gifs = session.createQuery(criteria).getResultList();
+        List<GifMetadata> gifMetadataList = session.createQuery(criteria).getResultList();
 
         // Close session
         session.close();
 
-        return gifs;
+        return gifMetadataList;
     }
 
-    public Gif findById(Long id) {
-        // Open session
+    public GifMetadata findById(Long id) {
         Session session = sessionFactory.openSession();
-        Gif gif = session.get(Gif.class, id);
-        // Close session
+        GifMetadata gifMetadata = session.get(GifMetadata.class, id);
+        Hibernate.initialize(gifMetadata.getKeywordList());
         session.close();
-
-        return gif;
+        return gifMetadata;
     }
 
-    public void save(Gif gif) {
-        // Open session
+    public void save(GifMetadata gifMetadata) {
+        // Open a session
         Session session = sessionFactory.openSession();
 
+        // Begin a transaction
         session.beginTransaction();
-        // Save all keywords
-        if (gif.getGifMetaData() != null) {
-            for (int i = 0; i < gif.getGifMetaData().getKeywordList().size(); i++) {
-                session.saveOrUpdate(gif.getGifMetaData().getKeywordList().get(i));
-            }
-            session.saveOrUpdate(gif.getGifMetaData());
-        }
-        session.saveOrUpdate(gif);
+
+        // Save or update the gif metadata
+        session.saveOrUpdate(gifMetadata);
+
+        // Commit the transaction
         session.getTransaction().commit();
 
-        // Close session
+        // Close the session
         session.close();
     }
 
-    public void delete(Gif gif) {
-        // Open session
+    public void delete(GifMetadata gifmetadata) {
         Session session = sessionFactory.openSession();
-
         session.beginTransaction();
-        session.delete(gif);
+        session.delete(gifmetadata);
         session.getTransaction().commit();
-
-        // Close session
         session.close();
     }
 }
