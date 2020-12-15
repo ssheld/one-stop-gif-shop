@@ -15,9 +15,6 @@ import org.springframework.validation.Validator;
 @Component
 public class GifValidator implements Validator {
 
-    @Autowired
-    private Validator validator;
-
     @Override
     public boolean supports(Class<?> clazz) {
         return Gif.class.equals(clazz);
