@@ -80,4 +80,8 @@ one-stop-gif-shop.iml
 
 # Target files
 /target/*
+
+# Database configuration files
 /src/main/resources/db/jdbc.properties
+/src/main/resources/db/s3.properties
+

@@ -16,7 +16,7 @@ public class Gif {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
+    @Transient
     private byte[] bytes;
 
     // @Transient means that the field value will NOT be persisted to the database.

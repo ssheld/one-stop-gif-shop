@@ -9,7 +9,7 @@ import java.util.List;
  **/
 public interface GifDao {
     List<Gif> findAll();
-    Gif findById(Long id);
-    void save(Gif gif);
-    void delete(Gif gif);
+    Gif findById(Long id) throws DaoException;
+    void save(Gif gif) throws DaoException;
+    void delete(Gif gif) throws DaoException;
 }
