@@ -86,4 +86,4 @@ one-stop-gif-shop.iml
 /src/main/resources/db/s3.properties
 
 # Security configuration files
-/src/main/resources/security/security.yml
+/src/main/resources/security/security.properties
