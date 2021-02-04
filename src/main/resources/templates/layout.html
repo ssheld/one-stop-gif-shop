@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:fragment="head(page_title)" lang="en">
     <meta charset="UTF-8"/>
@@ -27,13 +29,17 @@
                 <li th:classappend="${#httpServletRequest.servletPath.equals('/upload') ? 'active' : ''}"><a th:href="@{/upload}">Upload</a></li>
                 <li th:classappend="${#httpServletRequest.servletPath.equals('/') ? 'active' : ''}"><a th:href="@{/}">Explore</a></li>
                 <li th:classappend="${#httpServletRequest.servletPath.equals('/categories') ? 'active' : ''}"><a th:href="@{/categories}">Categories</a></li>
-                <li th:classappend="${#httpServletRequest.servletPath.equals('/favorites') ? 'active' : ''}"><a th:href="@{/favorites}">Favorites</a></li>
+                <li sec:authorize="isAuthenticated()" th:classappend="${#httpServletRequest.servletPath.equals('/favorites') ? 'active' : ''}"><a th:href="@{/favorites}">Favorites</a></li>
+                <li sec:authorize="isAnonymous()" th:classappend="${#httpServletRequest.servletPath.equals('/oauth2/authorization/auth0') ? 'active' : ''}"><a th:href="@{/oauth2/authorization/auth0}">Login</a></li>
+                <li sec:authorize="isAuthenticated()" th:classappend="${#httpServletRequest.servletPath.equals('/logout') ? 'active' : ''}"><a th:href="@{/logout}">Logout</a></li>
             </ul>
             <ul id="mobile-nav" class="side-nav">
                 <li th:classappend="${#httpServletRequest.servletPath.equals('/upload') ? 'active' : ''}"><a th:href="@{/upload}">Upload</a></li>
                 <li th:classappend="${#httpServletRequest.servletPath.equals('/') ? 'active' : ''}"><a th:href="@{/}">Explore</a></li>
                 <li th:classappend="${#httpServletRequest.servletPath.equals('/categories') ? 'active' : ''}"><a th:href="@{/categories}">Categories</a></li>
-                <li th:classappend="${#httpServletRequest.servletPath.equals('/favorites') ? 'active' : ''}"><a th:href="@{/favorites}">Favorites</a></li>
+                <li sec:authorize="isAuthenticated()" th:classappend="${#httpServletRequest.servletPath.equals('/favorites') ? 'active' : ''}"><a th:href="@{/favorites}">Favorites</a></li>
+                <li sec:authorize="isAnonymous()" th:classappend="${#httpServletRequest.servletPath.equals('/oauth2/authorization/auth0') ? 'active' : ''}"><a th:href="@{/oauth2/authorization/auth0}">Login</a></li>
+                <li sec:authorize="isAuthenticated()" th:classappend="${#httpServletRequest.servletPath.equals('/logout') ? 'active' : ''}"><a th:href="@{/logout}">Logout</a></li>
             </ul>
         </div>
     </nav>
