@@ -7,7 +7,7 @@ library for users to reference when looking for GIFs they frequently use.
 
 # Is this website currently live?
 
-Yes! You can view it at https://onestogifshop.com
+Yes! You can view it at https://onestopgifshop.com
 
 # What does your technology stack consist of?
 
