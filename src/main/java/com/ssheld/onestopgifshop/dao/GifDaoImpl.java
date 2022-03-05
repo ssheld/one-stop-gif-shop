@@ -118,6 +118,10 @@ public class GifDaoImpl implements GifDao {
     private void saveToS3(MultipartFile multipartFile, String gifId) throws DaoException {
         bucketName = env.getProperty("app.awsServices.bucketName");
 
+        if (multipartFile.isEmpty()) {
+            return;
+        }
+
         try {
             File file = ServiceUtils.convertMultiPartToFile(multipartFile);
             amazonS3.putObject(bucketName, gifId, file);
