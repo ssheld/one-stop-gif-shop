@@ -7,7 +7,7 @@ library for users to reference when looking for GIFs they frequently use.
 
 # Is this website currently live?
 
-Yes! You can view it at https://onestopgifshop.com
+This website is not live. Currently migrating it from AWS to Heroku.
 
 # What does your technology stack consist of?
 

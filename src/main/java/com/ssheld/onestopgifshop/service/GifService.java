@@ -10,8 +10,8 @@ import java.util.List;
  **/
 public interface GifService {
     List<Gif> findAll();
-    Gif findById(Long id);
-    void save(Gif gif, MultipartFile file);
-    void delete(Gif gif);
-    void toggleFavorite(Gif gif);
+    Gif findById(Long id) throws ServiceException;
+    void save(Gif gif, MultipartFile file) throws ServiceException;
+    void delete(Gif gif) throws ServiceException;
+    void toggleFavorite(Gif gif) throws ServiceException;
 }

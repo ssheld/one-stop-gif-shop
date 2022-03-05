@@ -81,9 +81,12 @@ one-stop-gif-shop.iml
 # Target files
 /target/*
 
-# Database configuration files
-/src/main/resources/db/jdbc.properties
-/src/main/resources/db/s3.properties
+# Ignore gifs
+*.gif
 
-# Security configuration files
-/src/main/resources/security/security.properties
+# ds-store
+.DS_Store
+src/.DS_Store
+
+# Dependency reduced pom
+dependency-reduced-pom.xml

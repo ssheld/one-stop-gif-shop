@@ -5,6 +5,7 @@ import com.ssheld.onestopgifshop.model.Gif;
 import com.ssheld.onestopgifshop.model.GifMetadata;
 import com.ssheld.onestopgifshop.service.CategoryService;
 import com.ssheld.onestopgifshop.service.GifService;
+import com.ssheld.onestopgifshop.service.ServiceException;
 import com.ssheld.onestopgifshop.validator.GifValidator;
 import com.ssheld.onestopgifshop.web.FlashMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +51,18 @@ public class GifController {
     // Single GIF page
     @RequestMapping("/gifs/{gifId}")
     public String gifDetails(@PathVariable Long gifId, Model model) {
-        // Get gif whose id is gifId
-        Gif gif = gifService.findById(gifId);
 
-        // Generate keyword string
-        gif.generateKeywordString();
+        try {
+            // Get gif whose id is gifId
+            Gif gif = gifService.findById(gifId);
 
-        model.addAttribute("gif", gif);
+            // Generate keyword string
+            gif.generateKeywordString();
+
+            model.addAttribute("gif", gif);
+        } catch (ServiceException se) {
+            System.out.println("Service Exception occurred in GifController");
+        }
         return "gif/details";
     }
 
@@ -64,8 +70,17 @@ public class GifController {
     @RequestMapping("/gifs/{gifId}.gif")
     @ResponseBody
     public byte[] gifImage(@PathVariable Long gifId) {
-        // Return image data as byte array of the GIF whose id is gifId
-        return gifService.findById(gifId).getBytes();
+
+        // TODO - Add proper error handling
+
+        try {
+            // Return image data as byte array of the GIF whose id is gifId
+            return gifService.findById(gifId).getBytes();
+        }
+        catch (ServiceException se) {
+            System.out.println("Service Exception occurred in GifController");
+            return null;
+        }
     }
 
     // Favorites - index of all GIFs marked favorite
@@ -113,14 +128,21 @@ public class GifController {
             gif.setGifMetaData(gifMetadata);
         }
 
-        // Upload new GIF if data is valid
-        gifService.save(gif, gif.getFile());
+        try {
+            // Upload new GIF if data is valid
+            gifService.save(gif, gif.getFile());
 
-        // Add flash message for success
-        redirectAttributes.addFlashAttribute("flash", new FlashMessage("GIF successfully uploaded!", FlashMessage.Status.SUCCESS));
+            // Add flash message for success
+            redirectAttributes.addFlashAttribute("flash", new FlashMessage("GIF successfully uploaded!", FlashMessage.Status.SUCCESS));
 
-        // Redirect browser to new GIF's detail view
-        return String.format("redirect:/gifs/%s", gif.getId());
+            // Redirect browser to new GIF's detail view
+            return String.format("redirect:/gifs/%s", gif.getId());
+        } catch (ServiceException se) {
+            System.out.println("Service Exception occurred in GifController");
+            redirectAttributes.addFlashAttribute("flash", new FlashMessage("GIF Failed to upload.", FlashMessage.Status.FAILURE));
+            // Redirect back to upload page
+            return "redirect:/upload";
+        }
     }
 
     // Form for uploading a new GIF
@@ -141,15 +163,20 @@ public class GifController {
     // Form for editing an existing GIF
     @RequestMapping(value = "/gifs/{gifId}/edit")
     public String formEditGif(@PathVariable Long gifId, Model model) {
-        // Add model attributes needed for edit form
-        if (!model.containsAttribute("gif")) {
-            model.addAttribute("gif", gifService.findById(gifId));
+
+        try {
+            // Add model attributes needed for edit form
+            if (!model.containsAttribute("gif")) {
+                model.addAttribute("gif", gifService.findById(gifId));
+            }
+            // TODO - Add GIF file as default file selected in "upload file"
+            model.addAttribute("categories", categoryService.findAll());
+            model.addAttribute("action", String.format("/gifs/%s", gifId));
+            model.addAttribute("heading", "Edit GIF");
+            model.addAttribute("submit", "Update");
+        } catch (ServiceException se) {
+            System.out.println("Service Exception occurred in GifController");
         }
-        // TODO - Add GIF file as default file selected in "upload file"
-        model.addAttribute("categories", categoryService.findAll());
-        model.addAttribute("action", String.format("/gifs/%s",gifId));
-        model.addAttribute("heading", "Edit GIF");
-        model.addAttribute("submit", "Update");
 
         return "gif/form";
     }
@@ -182,9 +209,15 @@ public class GifController {
             gif.setGifMetaData(gifMetadata);
         }
 
-        gifService.save(gif, gif.getFile());
+        try {
+            gifService.save(gif, gif.getFile());
 
-        redirectAttributes.addFlashAttribute("flash", new FlashMessage("Gif successfully updated!", FlashMessage.Status.SUCCESS));
+            redirectAttributes.addFlashAttribute("flash", new FlashMessage("GIF successfully updated!", FlashMessage.Status.SUCCESS));
+
+        } catch (ServiceException se) {
+            System.out.println("Service Exception occurred in GifController");
+            redirectAttributes.addFlashAttribute("flash", new FlashMessage("GIF failed to update.", FlashMessage.Status.FAILURE));
+        }
 
         return String.format("redirect:/gifs/%s", gif.getId());
     }
@@ -192,10 +225,16 @@ public class GifController {
     // Delete an existing GIF
     @RequestMapping(value = "/gifs/{gifId}/delete", method = RequestMethod.POST)
     public String deleteGif(@PathVariable Long gifId, RedirectAttributes redirectAttributes) {
-        Gif gif = gifService.findById(gifId);
-        // Delete the GIF whose id is gifId
-        gifService.delete(gif);
-        redirectAttributes.addFlashAttribute("flash", new FlashMessage("Gif deleted.", FlashMessage.Status.SUCCESS));
+
+        try {
+            Gif gif = gifService.findById(gifId);
+            // Delete the GIF whose id is gifId
+            gifService.delete(gif);
+            redirectAttributes.addFlashAttribute("flash", new FlashMessage("GIF deleted.", FlashMessage.Status.SUCCESS));
+        } catch (ServiceException se) {
+            System.out.println("Service Exception occurred in GifController");
+            redirectAttributes.addFlashAttribute("flash", new FlashMessage("Failed to delete GIF.", FlashMessage.Status.FAILURE));
+        }
         // Redirect to app root
         return "redirect:/";
     }
@@ -203,9 +242,13 @@ public class GifController {
     // Mark/unmark an existing GIF as a favorite
     @RequestMapping(value = "/gifs/{gifId}/favorite", method = RequestMethod.POST)
     public String toggleFavorite(@PathVariable Long gifId, HttpServletRequest request) {
-        // With GIF whose id is gifId, toggle the favorite field
-        Gif gif = gifService.findById(gifId);
-        gifService.toggleFavorite(gif);
+        try {
+            // With GIF whose id is gifId, toggle the favorite field
+            Gif gif = gifService.findById(gifId);
+            gifService.toggleFavorite(gif);
+        } catch (ServiceException se) {
+            System.out.println("Service Exception occurred in GifController");
+        }
         // Redirect to GIF's detail view
         return String.format("redirect:%s", request.getHeader("referer"));
     }
